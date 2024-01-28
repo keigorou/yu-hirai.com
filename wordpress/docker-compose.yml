@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    # platform: linux/x86_64
+    image: mysql:5.7
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: wp
+      MYSQL_DATABASE: wordpressdb
+      MYSQL_USER: wordpressuser
+      MYSQL_PASSWORD: wordpresspassword
+    volumes:
+      # SQLデータを最新にする場合だけコメントイン
+    # - ./docker/db/sqls:/docker-entrypoint-initdb.d // - ④
+      - db_data:/var/lib/mysql
+
+  wordpress:
+    container_name: wordpress
+    image: wordpress
+    restart: always
+    ports:
+      - 8080:80
+    volumes:
+      - ./html:/var/www/html
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: wordpressdb
+      WORDPRESS_DB_USER: wordpressuser
+      WORDPRESS_DB_PASSWORD: wordpresspassword
+    depends_on:
+          - db
+ 
+volumes:
+  db_data:
+
+networks:
+  default:
+   external: true
+   name: my_network
+
